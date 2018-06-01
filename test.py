@@ -12,7 +12,8 @@ def main():
     # response = requests.post(
     #     'http://127.0.0.1:5000/user',
     #     json.dumps(data),
-    #     headers={'Content-Type': 'application/json'})
+    #     headers={'Content-Type': 'application/json'}
+    # )
     # pprint.pprint(response.json())
 
 
@@ -25,7 +26,8 @@ def main():
     response = requests.post(
         'http://127.0.0.1:5000/watched_user',
         json.dumps(data),
-        headers={'Content-Type': 'application/json'})
+        headers={'Content-Type': 'application/json'}
+    )
     pprint.pprint(response.json())
 
 if __name__=='__main__':

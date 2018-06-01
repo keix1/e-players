@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -38,12 +38,16 @@ def add_user():
     username = request.json['username']
     email = request.json['email']
 
-    new_user = User(username, email)
+    exists = User.query.filter_by(username=username).first()
+    if exists:
+        abort(409)
+    else:
+        new_user = ser(username, email)
 
-    db.session.add(new_user)
-    db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
-    return jsonify(new_user)
+        return jsonify(new_user)
 
 
 # endpoint to show all users
@@ -57,33 +61,45 @@ def get_user():
 # endpoint to get user detail by id
 @app.route("/user/<id>", methods=["GET"])
 def user_detail(id):
-    user = User.query.get(id)
-    return user_schema.jsonify(user)
+    exists = User.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = User.query.get(id)
+        return user_schema.jsonify(user)
 
 
 # endpoint to update user
 @app.route("/user/<id>", methods=["PUT"])
 def user_update(id):
-    user = User.query.get(id)
-    username = request.json['username']
-    email = request.json['email']
-    point = request.json['point']
+    exists = User.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = User.query.get(id) 
+        username = request.json['username']
+        email = request.json['email']
+        point = request.json['point']
 
-    user.email = email
-    user.username = username
-    user.point = point
+        user.email = email
+        user.username = username
+        user.point = point
 
-    db.session.commit()
-    return user_schema.jsonify(user)
+        db.session.commit()
+        return user_schema.jsonify(user)
 
 
 # endpoint to delete user
 @app.route("/user/<id>", methods=["DELETE"])
 def user_delete(id):
-    user = User.query.get(id)
-    db.session.delete(user)
-    db.session.commit()
-    return user_schema.jsonify(user)
+    exists = User.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = User.query.get(id)
+        db.session.delete(user)
+        db.session.commit()
+        return user_schema.jsonify(user)
 
 
 
@@ -117,12 +133,16 @@ def add_watched_user():
     major = request.json['major']
     minor = request.json['minor']
 
-    new_user = WatchedUser(username, major, minor)
+    exists = WatchedUser.query.filter_by(username=username).first()
+    if exists:
+        abort(409)
+    else:
+        new_user = WatchedUser(username, major, minor)
 
-    db.session.add(new_user)
-    db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
-    return jsonify(new_user)
+        return jsonify(new_user)
 
 
 # endpoint to show all users
@@ -136,34 +156,56 @@ def get_watched_user():
 # endpoint to get user detail by id
 @app.route("/watched_user/<id>", methods=["GET"])
 def watched_user_detail(id):
-    user = WatcheUser.query.get(id)
-    return watched_user_schema.jsonify(user)
+    exists = WatchedUser.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = WatcheUser.query.get(id)
+        return watched_user_schema.jsonify(user)
 
 
 # endpoint to update user
 @app.route("/watched_user/<id>", methods=["PUT"])
 def watched_user_update(id):
-    user = WatcheUser.query.get(id)
-    username = request.json['username']
-    major = request.json['major']
-    minor = request.json['minor']
+    exists = WatchedUser.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = WatcheUser.query.get(id)
+        username = request.json['username']
+        major = request.json['major']
+        minor = request.json['minor']
 
-    user.email = email
-    user.major = major
-    user.minor = minor
+        user.email = email
+        user.major = major
+        user.minor = minor
 
-    db.session.commit()
-    return watched_user_schema.jsonify(user)
+        db.session.commit()
+        return watched_user_schema.jsonify(user)
 
 
 # endpoint to delete user
 @app.route("/watched_user/<id>", methods=["DELETE"])
 def watched_user_delete(id):
-    user = WatcheUser.query.get(id)
-    db.session.delete(user)
-    db.session.commit()
-    return watched_user_schema.jsonify(user)
+    exists = WatchedUser.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        user = WatcheUser.query.get(id)
+        db.session.delete(user)
+        db.session.commit()
+        return watched_user_schema.jsonify(user)
 
+
+@app.errorhandler(404)
+@app.errorhandler(409)
+def error_handler(error):
+    '''
+     Description
+      - abort(404) / abort(409) した時にレスポンスをレンダリングするハンドラ
+    '''
+    response = jsonify({ 'message': error.name, 'result': error.code })
+    return response, error.code
 
 # Main
 if __name__ == '__main__':
