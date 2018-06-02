@@ -35,8 +35,11 @@ users_schema = UserSchema(many=True)
 # endpoint to create new user
 @app.route("/user", methods=["POST"])
 def add_user():
-    username = request.json['username']
-    email = request.json['email']
+    try:
+        username = request.json['username']
+        email = request.json['email']
+    except (ValueError, KeyError, TypeError):
+        abort(400)
 
     exists = User.query.filter_by(username=username).first()
     if exists:
@@ -76,14 +79,40 @@ def user_update(id):
     if not exists:
         abort(404)
     else:
-        user = User.query.get(id) 
-        username = request.json['username']
-        email = request.json['email']
-        point = request.json['point']
+        try:
+            username = request.json['username']
+            email = request.json['email']
+            point = request.json['point']
+        except (ValueError, KeyError, TypeError):
+            abort(400)
 
+        user = User.query.get(id)
         user.email = email
         user.username = username
         user.point = point
+
+        db.session.commit()
+        return user_schema.jsonify(user)
+
+
+# endpoint to update user's point
+@app.route("/user/<id>", methods=["PATCH"])
+def point_update(id):
+    '''
+        指定したidのuserのポイントをpoint_increment分だけ足す。
+    '''
+    exists = User.query.filter_by(id=id).first()
+    if not exists:
+        abort(404)
+    else:
+        try:
+            point_increment = request.json['point_increment']
+        except (ValueError, KeyError, TypeError):
+            abort(400)
+
+        user = User.query.get(id)
+        point = user.point
+        user.point = point + point_increment
 
         db.session.commit()
         return user_schema.jsonify(user)
@@ -129,9 +158,12 @@ watched_users_schema = WatchedUserSchema(many=True)
 # endpoint to create new user
 @app.route("/watched_user", methods=["POST"])
 def add_watched_user():
-    username = request.json['username']
-    major = request.json['major']
-    minor = request.json['minor']
+    try:
+        username = request.json['username']
+        major = request.json['major']
+        minor = request.json['minor']
+    except (ValueError, KeyError, TypeError):
+        abort(400)
 
     exists = WatchedUser.query.filter_by(username=username).first()
     if exists:
@@ -171,10 +203,14 @@ def watched_user_update(id):
     if not exists:
         abort(404)
     else:
+        try:
+            username = request.json['username']
+            major = request.json['major']
+            minor = request.json['minor']
+        except (ValueError, KeyError, TypeError):
+            abort(400)
+
         user = WatcheUser.query.get(id)
-        username = request.json['username']
-        major = request.json['major']
-        minor = request.json['minor']
 
         user.email = email
         user.major = major
@@ -197,12 +233,13 @@ def watched_user_delete(id):
         return watched_user_schema.jsonify(user)
 
 
+@app.errorhandler(400)
 @app.errorhandler(404)
 @app.errorhandler(409)
 def error_handler(error):
     '''
      Description
-      - abort(404) / abort(409) した時にレスポンスをレンダリングするハンドラ
+      - abortした時にレスポンスをレンダリングするハンドラ
     '''
     response = jsonify({ 'message': error.name, 'result': error.code })
     return response, error.code
