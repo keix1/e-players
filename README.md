@@ -41,7 +41,7 @@ https://mimaco.herokuapp.com/user
   * 出力データ：{"username", "email", "point"}が格納されたjsonデータ
   * エラー処理：`id`が存在しない場合、`404`エラーを返します。
 * `POST`: 入力データをもとに新たにユーザを作成します。
-  * 入力データ：{"username", "email", "point"}が格納されたjsonデータ
+  * 入力データ：{"username", "email"}が格納されたjsonデータ
   * 出力データ：登録された{"username", "email", "point"}が格納されたjsonデータ
   * エラー処理：既に"username"が存在していたら、`409`エラーを返します。
 * `PUT`: 指定された`id`のuserのデータを書き換えます。
