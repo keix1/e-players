@@ -45,7 +45,7 @@ def add_user():
     if exists:
         abort(409)
     else:
-        new_user = ser(username, email)
+        new_user = User(username, email)
 
         db.session.add(new_user)
         db.session.commit()
