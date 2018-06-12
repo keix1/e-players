@@ -95,36 +95,75 @@ def user_update(id):
         return user_schema.jsonify(user)
 
 
-# endpoint to update user's point
+# # endpoint to update user's point
 # @app.route("/user/<id>", methods=["PATCH"])
 # def point_update(id):
-#    '''
-#        指定したidのuserのポイントをpoint_increment分だけ足す。
-#    '''
-#    exists = User.query.filter_by(id=id).first()
-#    if not exists:
-#        abort(404)
-#    else:
-#        try:
-#            point_increment = request.json['point_increment']
-#        except (ValueError, KeyError, TypeError):
-#            abort(400)
+#     '''
+#         指定したidのuserのポイントをpoint_increment分だけ足す。
+#     '''
+#     exists = User.query.filter_by(id=id).first()
+#     if not exists:
+#         abort(404)
+#     else:
+#         try:
+#             point_increment = request.json['point_increment']
+#         except (ValueError, KeyError, TypeError):
+#             abort(400)
+#
+#         user = User.query.get(id)
+#         point = user.point
+#         user.point = point + point_increment
+#
+#         db.session.commit()
+#         return user_schema.jsonify(user)
 
-#        user = User.query.get(id)
-#        point = user.point
-#        user.point = point + point_increment
 
-#        db.session.commit()
-#        return user_schema.jsonify(user)
 
-# endpoint to update user's point
+# endpoint to update user
 @app.route("/user/<string:username>", methods=["POST"])
 def point_update(username):
-    '''
-        TODO: ポイント追加処理を書く
-    '''
-    line.lineNotify(username)
-    return ""
+    try:
+        username = request.json['username']
+        major = request.json['major']
+        minor = request.json['minor']
+        latitude = request.json['latitude']
+        longitude = request.json['longitude']
+        print('aaa')
+    except (ValueError, KeyError, TypeError):
+        print(username)
+        abort(400)
+
+    watched_usr = WatchedUser.query.filter_by(major=major,minor=minor).first()
+    # major, minorが一致するユーザがいないとき、新規追加
+    if not watched_usr:
+        try:
+            watched_username = request.json['watched_username']
+        except (ValueError, KeyError, TypeError):
+            abort(409)
+        watched_usr = WatchedUser(watched_username, major, minor)
+        db.session.add(watched_usr)
+        db.session.commit()
+    # いるとき、latitudeとlongitudeを更新（あとで行追加として再実装したい）
+    else:
+        watched_usr.longitude = longitude
+        watched_usr.latitude = latitude
+
+        db.session.commit()
+
+    usr = User.query.filter_by(username=username).first()
+    if not usr:
+        abort(404)
+    else:
+        usr.point += 1
+        db.session.commit()
+
+    line_message = username + "が" + watched_usr.username + "を見つけました"
+    line.lineNotify(line_message)
+
+    return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)
+
+
+
 
 
 # endpoint to delete user
@@ -147,17 +186,21 @@ class WatchedUser(db.Model):
     username = db.Column(db.String(80), unique=True)
     major = db.Column(db.Integer, unique=True)
     minor = db.Column(db.Integer, unique=True)
+    latitude = db.Column(db.String(80))
+    longitude = db.Column(db.String(80))
 
-    def __init__(self, username, major, minor):
+    def __init__(self, username, major, minor, latitude, longitude):
         self.username = username
         self.major = major
         self.minor = minor
+        self.latitude = latitude
+        self.longitude = longitude
 
 
 class WatchedUserSchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('username', 'major', 'minor')
+        fields = ('username', 'major', 'minor', 'latitude', 'longitude')
 
 
 watched_user_schema = WatchedUserSchema()
@@ -171,14 +214,17 @@ def add_watched_user():
         username = request.json['username']
         major = request.json['major']
         minor = request.json['minor']
+        latitude = request.json['latitude']
+        longitude = request.json['longitude']
     except (ValueError, KeyError, TypeError):
+        # print(username,major,minor,latitude,longitude)
         abort(400)
 
     exists = WatchedUser.query.filter_by(username=username).first()
     if exists:
         abort(409)
     else:
-        new_user = WatchedUser(username, major, minor)
+        new_user = WatchedUser(username, major, minor, latitude, longitude)
 
         db.session.add(new_user)
         db.session.commit()
@@ -216,6 +262,8 @@ def watched_user_update(id):
             username = request.json['username']
             major = request.json['major']
             minor = request.json['minor']
+            latitude = request.json['latitude']
+            longitude = request.json['longitude']
         except (ValueError, KeyError, TypeError):
             abort(400)
 
@@ -224,6 +272,8 @@ def watched_user_update(id):
         user.email = email
         user.major = major
         user.minor = minor
+        user.latitude = latitude
+        user.longitude = longitude
 
         db.session.commit()
         return watched_user_schema.jsonify(user)
@@ -240,6 +290,7 @@ def watched_user_delete(id):
         db.session.delete(user)
         db.session.commit()
         return watched_user_schema.jsonify(user)
+
 
 @app.errorhandler(400)
 @app.errorhandler(404)
