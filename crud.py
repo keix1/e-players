@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-
+import line
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -117,6 +117,14 @@ def point_update(id):
         db.session.commit()
         return user_schema.jsonify(user)
 
+# endpoint to update user's point
+@app.route("/user/<string:username>", methods=["PATCH"])
+def point_update(username):
+    '''
+        TODO: ポイント追加処理を書く
+    '''
+    line.lineNotify(username)
+
 
 # endpoint to delete user
 @app.route("/user/<id>", methods=["DELETE"])
@@ -231,7 +239,6 @@ def watched_user_delete(id):
         db.session.delete(user)
         db.session.commit()
         return watched_user_schema.jsonify(user)
-
 
 @app.errorhandler(400)
 @app.errorhandler(404)
