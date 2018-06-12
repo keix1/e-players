@@ -96,34 +96,35 @@ def user_update(id):
 
 
 # endpoint to update user's point
-@app.route("/user/<id>", methods=["PATCH"])
-def point_update(id):
-    '''
-        指定したidのuserのポイントをpoint_increment分だけ足す。
-    '''
-    exists = User.query.filter_by(id=id).first()
-    if not exists:
-        abort(404)
-    else:
-        try:
-            point_increment = request.json['point_increment']
-        except (ValueError, KeyError, TypeError):
-            abort(400)
+# @app.route("/user/<id>", methods=["PATCH"])
+# def point_update(id):
+#    '''
+#        指定したidのuserのポイントをpoint_increment分だけ足す。
+#    '''
+#    exists = User.query.filter_by(id=id).first()
+#    if not exists:
+#        abort(404)
+#    else:
+#        try:
+#            point_increment = request.json['point_increment']
+#        except (ValueError, KeyError, TypeError):
+#            abort(400)
 
-        user = User.query.get(id)
-        point = user.point
-        user.point = point + point_increment
+#        user = User.query.get(id)
+#        point = user.point
+#        user.point = point + point_increment
 
-        db.session.commit()
-        return user_schema.jsonify(user)
+#        db.session.commit()
+#        return user_schema.jsonify(user)
 
 # endpoint to update user's point
-@app.route("/user/<string:username>", methods=["PATCH"])
+@app.route("/user/<string:username>", methods=["POST"])
 def point_update(username):
     '''
         TODO: ポイント追加処理を書く
     '''
     line.lineNotify(username)
+    return ""
 
 
 # endpoint to delete user
