@@ -128,9 +128,7 @@ def point_update(username):
         minor = request.json['minor']
         latitude = request.json['latitude']
         longitude = request.json['longitude']
-        print('aaa')
     except (ValueError, KeyError, TypeError):
-        print(username)
         abort(400)
 
     watched_usr = WatchedUser.query.filter_by(major=major,minor=minor).first()
