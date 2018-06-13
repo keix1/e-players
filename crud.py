@@ -145,6 +145,7 @@ def point_update(username):
     else:
         watched_usr.longitude = longitude
         watched_usr.latitude = latitude
+        line_token = watched_usr.line_token
 
         db.session.commit()
 
@@ -156,7 +157,7 @@ def point_update(username):
         db.session.commit()
 
     line_message = username + "が" + watched_usr.username + "を見つけました"
-    line.lineNotify(line_message)
+    line.lineNotify(line_message,line_token)
 
     return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)
 
@@ -186,13 +187,16 @@ class WatchedUser(db.Model):
     minor = db.Column(db.Integer, unique=True)
     latitude = db.Column(db.String(80))
     longitude = db.Column(db.String(80))
+    line_token = db.Column(db.String(80))
 
-    def __init__(self, username, major, minor, latitude, longitude):
+    def __init__(self, username, major, minor, latitude, longitude, line_token):
         self.username = username
         self.major = major
         self.minor = minor
         self.latitude = latitude
         self.longitude = longitude
+        self.line_token = line_token
+
 
 
 class WatchedUserSchema(ma.Schema):
@@ -214,6 +218,7 @@ def add_watched_user():
         minor = request.json['minor']
         latitude = request.json['latitude']
         longitude = request.json['longitude']
+        line_token = request.json['line_token']
     except (ValueError, KeyError, TypeError):
         # print(username,major,minor,latitude,longitude)
         abort(400)
@@ -222,7 +227,7 @@ def add_watched_user():
     if exists:
         abort(409)
     else:
-        new_user = WatchedUser(username, major, minor, latitude, longitude)
+        new_user = WatchedUser(username, major, minor, latitude, longitude, line_token)
 
         db.session.add(new_user)
         db.session.commit()
@@ -262,6 +267,7 @@ def watched_user_update(id):
             minor = request.json['minor']
             latitude = request.json['latitude']
             longitude = request.json['longitude']
+            line_token = request.json['line_token']
         except (ValueError, KeyError, TypeError):
             abort(400)
 
@@ -272,6 +278,7 @@ def watched_user_update(id):
         user.minor = minor
         user.latitude = latitude
         user.longitude = longitude
+        user.line_token = line_token
 
         db.session.commit()
         return watched_user_schema.jsonify(user)
