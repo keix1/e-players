@@ -156,7 +156,17 @@ def point_update(username):
         usr.point += 1
         db.session.commit()
 
-    line_message = username + "が" + watched_usr.username + "を見つけました"
+    line_message = {
+        'message': username + "が" + watched_usr.username + "を見つけました。\n" +
+        'https://www.google.com/maps?q='+ latitude + ',' + longitude
+    }
+    # line_message = {
+    #     'type':'location',
+    #     'title':username + "が" + watched_usr.username + "を見つけました",
+    #     'address':'住所だよ',
+    #     'latitude':float(latitude),
+    #     'longitude':float(longitude)
+    # }
     line.lineNotify(line_message,line_token)
 
     return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)

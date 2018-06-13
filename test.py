@@ -43,8 +43,8 @@ ap_data = {
     'username':'me',
     'major': 11111,
     'minor': 22222,
-    'latitude': '12345',
-    'longitude': '45678'
+    'latitude': '35.6694219',
+    'longitude': '139.4612045'
 }
 
 response = requests.post(
