@@ -81,11 +81,33 @@ def user_detail(username):
         return user_schema.jsonify(usr)
 
 
+# # endpoint to update user
+# @app.route("/user/<id>", methods=["PUT"])
+# def user_update(id):
+#     exists = User.query.filter_by(id=id).first()
+#     if not exists:
+#         abort(404)
+#     else:
+#         try:
+#             username = request.json['username']
+#             email = request.json['email']
+#             point = request.json['point']
+#         except (ValueError, KeyError, TypeError):
+#             abort(400)
+#
+#         user = User.query.get(id)
+#         user.email = email
+#         user.username = username
+#         user.point = point
+#
+#         db.session.commit()
+#         return user_schema.jsonify(user)
+
 # endpoint to update user
-@app.route("/user/<id>", methods=["PUT"])
-def user_update(id):
-    exists = User.query.filter_by(id=id).first()
-    if not exists:
+@app.route("/user/<string:username>", methods=["PUT"])
+def user_update(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
         abort(404)
     else:
         try:
@@ -95,7 +117,6 @@ def user_update(id):
         except (ValueError, KeyError, TypeError):
             abort(400)
 
-        user = User.query.get(id)
         user.email = email
         user.username = username
         user.point = point
@@ -185,13 +206,12 @@ def point_update(username):
 
 
 # endpoint to delete user
-@app.route("/user/<id>", methods=["DELETE"])
-def user_delete(id):
-    exists = User.query.filter_by(id=id).first()
-    if not exists:
+@app.route("/user/<string:username>", methods=["DELETE"])
+def user_delete(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
         abort(404)
     else:
-        user = User.query.get(id)
         db.session.delete(user)
         db.session.commit()
         return user_schema.jsonify(user)
@@ -263,21 +283,20 @@ def get_watched_user():
 
 
 # endpoint to get user detail by id
-@app.route("/watched_user/<id>", methods=["GET"])
-def watched_user_detail(id):
-    exists = WatchedUser.query.filter_by(id=id).first()
-    if not exists:
+@app.route("/watched_user/<string:username>", methods=["GET"])
+def watched_user_detail(username):
+    user = WatchedUser.query.filter_by(username=username).first()
+    if not user:
         abort(404)
     else:
-        user = WatcheUser.query.get(id)
         return watched_user_schema.jsonify(user)
 
 
 # endpoint to update user
-@app.route("/watched_user/<id>", methods=["PUT"])
-def watched_user_update(id):
-    exists = WatchedUser.query.filter_by(id=id).first()
-    if not exists:
+@app.route("/watched_user/<string:username>", methods=["PUT"])
+def watched_user_update(username):
+    user = WatchedUser.query.filter_by(username=username).first()
+    if not user:
         abort(404)
     else:
         try:
@@ -290,7 +309,6 @@ def watched_user_update(id):
         except (ValueError, KeyError, TypeError):
             abort(400)
 
-        user = WatcheUser.query.get(id)
 
         user.email = email
         user.major = major
@@ -304,13 +322,12 @@ def watched_user_update(id):
 
 
 # endpoint to delete user
-@app.route("/watched_user/<id>", methods=["DELETE"])
+@app.route("/watched_user/<string:username>", methods=["DELETE"])
 def watched_user_delete(id):
-    exists = WatchedUser.query.filter_by(id=id).first()
-    if not exists:
+    user = WatchedUser.query.filter_by(username=username).first()
+    if not user:
         abort(404)
     else:
-        user = WatcheUser.query.get(id)
         db.session.delete(user)
         db.session.commit()
         return watched_user_schema.jsonify(user)
