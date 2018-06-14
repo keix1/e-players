@@ -9,7 +9,7 @@ from time import sleep
 n = 5
 base_latitude = 35.53535
 base_longitude = 139.700954
-
+from tqdm import tqdm
 
 # %%
 u_data = {
@@ -29,11 +29,11 @@ response = requests.post(
 )
 
 # %%
-for i in range(100):
+for i in tqdm(range(1000)):
     random_str = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
-    rand_lat = base_latitude + 0.001*np.random.randn()
-    rand_long = base_longitude + 0.001*np.random.randn()
-    rand_nickname = random.choice(['太郎', 'たかし', 'アンドリュー', '慶一', '大輔', '大河', '淳一'])
+    rand_lat = base_latitude + 0.1*np.random.randn()
+    rand_long = base_longitude + 0.1*np.random.randn()
+    rand_nickname = random.choice(['太郎', 'たかし', 'アンドリュー', '慶一', '大輔', '大河', '淳一', '優子', 'りか', 'まき', 'りさ', 'みゆき', 'えり', '香織', 'りさ', 'はるか', 'あやか'])
 
     u_data = {
         'username':random_str,
@@ -49,7 +49,7 @@ for i in range(100):
         json.dumps(u_data),
         headers={'Content-Type': 'application/json'}
     )
-    sleep(0.5)
+    sleep(0.1)
 
     # pprint.pprint(response.json())
 
