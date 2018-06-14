@@ -105,7 +105,7 @@ def user_detail(username):
 
 # endpoint to update user
 @app.route("/user/<string:username>", methods=["PUT"])
-def user_update(username):
+def user_update(username):
     user = User.query.filter_by(username=username).first()
     if not user:
         abort(404)
