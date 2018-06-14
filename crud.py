@@ -15,21 +15,34 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
     point = db.Column(db.Integer)
+    latitude = db.Column(db.String(120))
+    longitude = db.Column(db.String(120))
 
-    def __init__(self, username, email):
+
+    def __init__(self, username, email, latitude, longitude):
         self.username = username
         self.email = email
         self.point = 0
+        self.latitude = latitude
+        self.longitude = longitude
 
 
 class UserSchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('username', 'email', 'point')
+        fields = ('username', 'email', 'point', 'latitude', 'longitude')
 
+
+class UserLocationSchema(ma.Schema):
+    class Meta:
+        # Fields to expose
+        fields = ('latitude', 'longitude')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
+user_location_schema = UserLocationSchema()
+user_locations_schema = UserLocationSchema(many=True)
 
 
 # endpoint to create new user
@@ -38,6 +51,9 @@ def add_user():
     try:
         username = request.json['username']
         email = request.json['email']
+        latitude = request.json['latitude']
+        longitude = request.json['longitude']
+
     except (ValueError, KeyError, TypeError):
         abort(400)
 
@@ -45,7 +61,7 @@ def add_user():
     if exists:
         abort(409)
     else:
-        new_user = User(username, email)
+        new_user = User(username, email, latitude, longitude)
 
         db.session.add(new_user)
         db.session.commit()
@@ -114,12 +130,16 @@ def user_update(username):
             username = request.json['username']
             email = request.json['email']
             point = request.json['point']
+            latitude = request.json['latitude']
+            longitude = request.json['longitude']
         except (ValueError, KeyError, TypeError):
             abort(400)
 
         user.email = email
         user.username = username
         user.point = point
+        user.latitude = latitude
+        user.longitude = longitude
 
         db.session.commit()
         return user_schema.jsonify(user)
@@ -188,7 +208,7 @@ def point_update(username):
 
     line_message = {
         'message': username + "が" + watched_usr.username + "を見つけました。\n" +
-        'https://www.google.com/maps?q='+ latitude + ',' + longitude
+        'https://www.google.com/maps?q='+ str(latitude) + ',' + str(longitude)
     }
     # line_message = {
     #     'type':'location',
@@ -199,10 +219,8 @@ def point_update(username):
     # }
     line.lineNotify(line_message,line_token)
 
-    return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)
-
-
-
+    # return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)
+    return user_schema.jsonify(usr)
 
 
 # endpoint to delete user
@@ -215,6 +233,15 @@ def user_delete(username):
         db.session.delete(user)
         db.session.commit()
         return user_schema.jsonify(user)
+
+
+# endpoint to show all users
+@app.route("/user_location", methods=["GET"])
+def get_user_location():
+    all_users = User.query.all()
+    result = user_locations_schema.dump(all_users)
+    return jsonify(result.data)
+
 
 
 
