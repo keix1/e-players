@@ -14,8 +14,9 @@ base_longitude = 139.362238
 # %%
 for i in range(100):
     random_str = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
-    rand_lat = 35.5557638 + np.random.randn()
-    rand_long = 139.362238 + np.random.randn()
+    rand_lat = 35.5557638 + 0.001*np.random.randn()
+    rand_long = 139.362238 + 0.001*np.random.randn()
+    rand_nickname = random.choice(['太郎', 'たかし', 'アンドリュー', '慶一', '大輔', '大河', '淳一'])
 
     u_data = {
         'username':random_str,
@@ -23,6 +24,7 @@ for i in range(100):
         'point': 0,
         'latitude': rand_lat,
         'longitude': rand_long,
+        'nickname': nickname
     }
 
     response = requests.post(
@@ -30,7 +32,7 @@ for i in range(100):
         json.dumps(u_data),
         headers={'Content-Type': 'application/json'}
     )
-    sleep(1)
+    sleep(0.5)
 
     # pprint.pprint(response.json())
 
