@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import line
+import numpy as np
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -136,6 +137,7 @@ def user_update(username):
             latitude = request.json['latitude']
             longitude = request.json['longitude']
             nickname = request.json['nickname']
+
         except (ValueError, KeyError, TypeError):
             abort(400)
 
@@ -245,8 +247,32 @@ def user_delete(username):
 # endpoint to show all users
 @app.route("/user_location", methods=["GET"])
 def get_user_location():
+    try:
+        latitude = float(request.json['latitude'])
+        longitude = float(request.json['longitude'])
+    except (ValueError, KeyError, TypeError):
+        latitude = 35.53535
+        longitude = 139.700954
     all_users = User.query.all()
-    result = user_locations_schema.dump(all_users)
+    users = []
+    distances = []
+    for user in all_users:
+        users.append(user)
+        lat = float(user.latitude)
+        long = float(user.longitude)
+        distances.append( (latitude-lat)**2 + (longitude-long)**2 )
+
+    sortdists = np.array(distances).argsort()
+    indices = np.where(sortdists<20)
+
+    selected_user = []
+    for i in indices[0]:
+        # print(i)
+        selected_user.append(users[i])
+
+    # result = user_locations_schema.dump(all_users)
+    result = user_locations_schema.dump(selected_user)
+
     return jsonify(result.data)
 
 
