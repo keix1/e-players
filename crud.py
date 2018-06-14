@@ -19,7 +19,6 @@ class User(db.Model):
     latitude = db.Column(db.String(120))
     longitude = db.Column(db.String(120))
     nickname = db.Column(db.String(80))
-    # pointrate = db.Column(db.Integer)
 
 
     def __init__(self, username, email, latitude, longitude, nickname):
@@ -203,16 +202,17 @@ def point_update(username):
     else:
         watched_usr.longitude = longitude
         watched_usr.latitude = latitude
+
         line_token = watched_usr.line_token
         wu_nickname = watched_usr.nickname
-
+        wu_pointrate = watched_usr.pointrate
         db.session.commit()
 
     usr = User.query.filter_by(username=username).first()
     if not usr:
         abort(404)
     else:
-        usr.point += 1
+        usr.point += 1*wu_pointrate
         u_nickname = usr.nickname
         db.session.commit()
 
@@ -289,8 +289,9 @@ class WatchedUser(db.Model):
     longitude = db.Column(db.String(80))
     line_token = db.Column(db.String(80))
     nickname = db.Column(db.String(80))
+    pointrate = db.Column(db.Integer)
 
-    def __init__(self, username, major, minor, latitude, longitude, line_token, nickname):
+    def __init__(self, username, major, minor, latitude, longitude, line_token, nickname, pointrate):
         self.username = username
         self.major = major
         self.minor = minor
@@ -298,6 +299,7 @@ class WatchedUser(db.Model):
         self.longitude = longitude
         self.line_token = line_token
         self.nickname = nickname
+        self.pointrate = pointrate
 
 
 
@@ -322,6 +324,7 @@ def add_watched_user():
         longitude = request.json['longitude']
         line_token = request.json['line_token']
         nickname = request.json['nickname']
+        pointrate = request.json['pointrate']
 
     except (ValueError, KeyError, TypeError):
         # print(username,major,minor,latitude,longitude)
@@ -331,7 +334,7 @@ def add_watched_user():
     if exists:
         abort(409)
     else:
-        new_user = WatchedUser(username, major, minor, latitude, longitude, line_token, nickname)
+        new_user = WatchedUser(username, major, minor, latitude, longitude, line_token, nickname, pointrate)
 
         db.session.add(new_user)
         db.session.commit()
@@ -372,6 +375,7 @@ def watched_user_update(username):
             longitude = request.json['longitude']
             line_token = request.json['line_token']
             nickname = request.json['nickname']
+            pointrate = request.json['pointrate']
 
         except (ValueError, KeyError, TypeError):
             abort(400)
@@ -384,6 +388,7 @@ def watched_user_update(username):
         user.longitude = longitude
         user.line_token = line_token
         user.nickname = nickname
+        user.pointrate = pointrate
 
         db.session.commit()
         return watched_user_schema.jsonify(user)
