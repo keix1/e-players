@@ -61,15 +61,24 @@ def get_user():
     return jsonify(result.data)
 
 
+# # endpoint to get user detail by id
+# @app.route("/user/<id>", methods=["GET"])
+# def user_detail(id):
+#     exists = User.query.filter_by(id=id).first()
+#     if not exists:
+#         abort(404)
+#     else:
+#         user = User.query.get(id)
+#         return user_schema.jsonify(user)
+
 # endpoint to get user detail by id
-@app.route("/user/<id>", methods=["GET"])
-def user_detail(id):
-    exists = User.query.filter_by(id=id).first()
-    if not exists:
+@app.route("/user/<string:username>", methods=["GET"])
+def user_detail(username):
+    usr = User.query.filter_by(username=username).first()
+    if not usr:
         abort(404)
     else:
-        user = User.query.get(id)
-        return user_schema.jsonify(user)
+        return user_schema.jsonify(usr)
 
 
 # endpoint to update user

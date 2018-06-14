@@ -22,12 +22,12 @@ pprint.pprint(response.json())
 # %%
 LINE_API_KEY = settings.LINE_API_KEY
 wu_data = {
-    'username':'you',
-    'major': 11111,
-    'minor': 22222,
+    'username':'keix1',
+    'major': 38649,
+    'minor': 30703,
     'latitude': '123',
     'longitude': '456',
-    'line_token': LINE_API_KEY
+    'line_token': 'LINE_API_KEY'
 }
 
 response = requests.post(

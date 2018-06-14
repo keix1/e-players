@@ -6,14 +6,12 @@
 | id | username | email | point|
 |:---:|:---:|:---:|:---:|
 | 1 | me | me@mail.com | 0 |
-| 2 | you | you@mail.com | 0 |
-| 3 | he | he@mail.com | 0 |
 
 
 ### WatchedUser DB
-| id | username | major | minor|
-|:---:|:---:|:---:|:---:|
-| 1 | she | 11111 | 22222 |
+| id | username | major | minor| latitude | longitude | line_token|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | you | 11111 | 22222 | 39.4 | 135.66| abcde|
 
 
 ## How to use
