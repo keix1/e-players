@@ -19,6 +19,7 @@ class User(db.Model):
     latitude = db.Column(db.String(120))
     longitude = db.Column(db.String(120))
     nickname = db.Column(db.String(80))
+    # pointrate = db.Column(db.Integer)
 
 
     def __init__(self, username, email, latitude, longitude, nickname):
