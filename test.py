@@ -29,7 +29,7 @@ response = requests.post(
 )
 
 # %%
-for i in tqdm(range(10000)):
+for i in tqdm(range(1000)):
     random_str = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
     rand_lat = base_latitude + 0.1*np.random.randn()
     rand_long = base_longitude + 0.1*np.random.randn()
@@ -55,7 +55,8 @@ for i in tqdm(range(10000)):
 
 
 # %%
-LINE_API_KEY = settings.LINE_API_KEY
+# LINE_API_KEY = settings.LINE_API_KEY
+LINE_API_KEY = "n72C4LeMXBDsl3Y4oR7GCspgoY7sloDG23ygRRFYRhg"
 
 wu_data = {
     'username':'keix1',
