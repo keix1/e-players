@@ -64,7 +64,7 @@ wu_data = {
     'latitude': '35.6694219',
     'longitude': '139.4612045',
     'line_token': LINE_API_KEY,
-    'nickname': 'けいいち',
+    'nickname': '子ども',
     'pointrate': 1
 }
 
@@ -77,16 +77,18 @@ pprint.pprint(response.json())
 
 
 # %%
-for i in tqdm(range(10000)):
+for i in tqdm(range(1000)):
     random_str = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
     rand_lat = base_latitude + 0.1*np.random.randn()
     rand_long = base_longitude + 0.1*np.random.randn()
     rand_nickname = random.choice(['太郎', 'たかし', 'アンドリュー', '慶一', '大輔', '大河', '淳一', '優子', 'りか', 'まき', 'りさ', 'みゆき', 'えり', '香織', 'りさ', 'はるか', 'あやか'])
-    rand_rate = random,choice([1,2,3])
+    rand_rate = random.choice([1,2,3])
+    rand_major = random.randint(10000, 99999)
+    rand_minor = random.randint(10000, 99999)
     u_data = {
         'username':random_str,
-        'major': 38649,
-        'minor': 30703,
+        'major': rand_major,
+        'minor': rand_minor,
         'latitude': rand_lat,
         'longitude': rand_long,
         'line_token': LINE_API_KEY,
@@ -95,7 +97,7 @@ for i in tqdm(range(10000)):
     }
 
     response = requests.post(
-        'http://0.0.0.0:80/user',
+        'http://0.0.0.0:80/watched_user',
         json.dumps(u_data),
         headers={'Content-Type': 'application/json'}
     )
@@ -104,7 +106,6 @@ for i in tqdm(range(10000)):
     # pprint.pprint(response.json())
 
 
-KEYS = [LINE_API_KEY1,LINE_API_KEY2]
 
 # %%
 ap_data = {
