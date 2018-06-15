@@ -101,7 +101,7 @@ for i in tqdm(range(1000)):
         json.dumps(u_data),
         headers={'Content-Type': 'application/json'}
     )
-    # sleep(0.01)
+    sleep(0.01)
 
     # pprint.pprint(response.json())
 
