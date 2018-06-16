@@ -23,7 +23,7 @@ u_data = {
     'point': 0,
     'latitude': base_latitude,
     'longitude': base_longitude,
-    'nickname': 'おじいちゃん',
+    'nickname': '和菓子屋のお姉さん',
     'line_token': matsuoka_token_point
 }
 
@@ -41,7 +41,7 @@ for i in tqdm(range(1000)):
     rand_lat = base_latitude + 0.1*np.random.randn()
     rand_long = base_longitude + 0.1*np.random.randn()
     rand_nickname = random.choice(['太郎', 'たかし', 'アンドリュー', '慶一', '大輔', '大河', '淳一', '優子', 'りか', 'まき', 'りさ', 'みゆき', 'えり', '香織', 'りさ', 'はるか', 'あやか'])
-    random_token = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(10)])
+    random_token = ''.join([andom.choice(string.ascii_letters + string.digits) for i in range(10)])
 
     u_data = {
         'username':random_str,
@@ -61,6 +61,7 @@ for i in tqdm(range(1000)):
     # sleep(0.01)
 
     # pprint.pprint(response.json())
+
 
 
 # add fixed watched_usr
