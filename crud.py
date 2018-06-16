@@ -19,15 +19,17 @@ class User(db.Model):
     latitude = db.Column(db.String(120))
     longitude = db.Column(db.String(120))
     nickname = db.Column(db.String(80))
+    line_token = db.Column(db.String(120))
 
 
-    def __init__(self, username, email, latitude, longitude, nickname):
+    def __init__(self, username, email, latitude, longitude, nickname, line_token):
         self.username = username
         self.email = email
         self.point = 0
         self.latitude = latitude
         self.longitude = longitude
         self.nickname = nickname
+        self.line_token = line_token
 
 
 class UserSchema(ma.Schema):
@@ -57,6 +59,7 @@ def add_user():
         latitude = request.json['latitude']
         longitude = request.json['longitude']
         nickname = request.json['nickname']
+        line_token = request.json['line_token']
 
     except (ValueError, KeyError, TypeError):
         abort(400)
@@ -65,7 +68,7 @@ def add_user():
     if exists:
         abort(409)
     else:
-        new_user = User(username, email, latitude, longitude, nickname)
+        new_user = User(username, email, latitude, longitude, nickname, line_token)
 
         db.session.add(new_user)
         db.session.commit()
@@ -137,6 +140,7 @@ def user_update(username):
             latitude = request.json['latitude']
             longitude = request.json['longitude']
             nickname = request.json['nickname']
+            line_token = request.json['line_token']
 
         except (ValueError, KeyError, TypeError):
             abort(400)
@@ -147,6 +151,7 @@ def user_update(username):
         user.latitude = latitude
         user.longitude = longitude
         user.nickname = nickname
+        user.line_token = line_token
 
         db.session.commit()
         return user_schema.jsonify(user)
@@ -203,7 +208,7 @@ def point_update(username):
         watched_usr.longitude = longitude
         watched_usr.latitude = latitude
 
-        line_token = watched_usr.line_token
+        wu_line_token = watched_usr.wu_line_token
         wu_nickname = watched_usr.nickname
         wu_pointrate = watched_usr.pointrate
         db.session.commit()
@@ -214,9 +219,10 @@ def point_update(username):
     else:
         usr.point += 1*wu_pointrate
         u_nickname = usr.nickname
+        u_line_token = usr.nickname
         db.session.commit()
 
-    line_message = {
+    wu_line_message = {
         'message': u_nickname + "が" + wu_nickname + "を見つけました。\n" +
         'https://www.google.com/maps?q='+ str(latitude) + ',' + str(longitude)
     }
@@ -227,7 +233,14 @@ def point_update(username):
     #     'latitude':float(latitude),
     #     'longitude':float(longitude)
     # }
-    line.lineNotify(line_message,line_token)
+    line.lineNotify(wu_line_message,wu_line_token)
+
+
+    u_line_message = {
+        'message': "あなたの現在のポイントは" + str(usr.point) + "です。"
+    }
+    line.lineNotify(u_line_message,u_line_token)
+
 
     # return user_schema.jsonify(usr), watched_user_schema.jsonify(watched_usr)
     return user_schema.jsonify(usr)
