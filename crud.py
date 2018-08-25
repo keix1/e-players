@@ -97,6 +97,17 @@ def get_user():
 # endpoint to get user detail by id
 @app.route("/user/<string:username>", methods=["GET"])
 def user_detail(username):
+
+# ポイントアップ処理 GETだけど動作確認用
+    usr = User.query.filter_by(username=username).first()
+    if not usr:
+        abort(404)
+    else:
+        usr.point += 1
+        u_nickname = usr.nickname
+        u_line_token = usr.nickname
+        db.session.commit()
+
     usr = User.query.filter_by(username=username).first()
     if not usr:
         abort(404)
